@@ -1,0 +1,61 @@
+{
+  "mcpServers": {
+    "primary-clarifier-mcp": {
+      "type": "stdio",
+      "command": "/mnt/c/Users/hvksh/mcp-servers/venv312/Scripts/python.exe",
+      "args": [
+        "C:\\Users\\hvksh\\mcp-servers\\primary-clarifier-mcp\\server.py"
+      ],
+      "env": {
+        "MCP_TIMEOUT": "600000",
+        "PRIMARY_CLARIFIER_MCP_ROOT": "C:\\Users\\hvksh\\mcp-servers\\primary-clarifier-mcp",
+        "QSDSAN_TIMEOUT_S": "300"
+      }
+    },
+    "clarifier-kb": {
+      "command": "/home/hvksh/knowledgebase/.venv/bin/python",
+      "args": [
+        "/home/hvksh/knowledgebase/server.py",
+        "stdio"
+      ],
+      "env": {
+        "OLLAMA_URL": "http://localhost:11434",
+        "OLLAMA_MODEL": "snowflake-arctic-embed:xs",
+        "TEI_RERANK_URL": "http://localhost:8087",
+        "QDRANT_URL": "http://localhost:6333",
+        "FTS_DB_PATH": "/home/hvksh/knowledgebase/data/clarifier_kb_fts.db",
+        "NOMIC_KB_SCOPES": "{\"clarifier\":{\"collection\":\"clarifier_kb\",\"title\":\"Clarifier Knowledge Base\",\"fts_db\":\"/home/hvksh/knowledgebase/data/clarifier_kb_fts.db\"},\"daf\":{\"collection\":\"daf_kb\",\"title\":\"DAF Knowledge Base\",\"fts_db\":\"/home/hvksh/knowledgebase/data/daf_kb_fts.db\"},\"misc_process\":{\"collection\":\"misc_process_kb\",\"title\":\"Miscellaneous Process Knowledge Base\",\"fts_db\":\"/home/hvksh/knowledgebase/data/misc_process_kb_fts.db\"}}"
+      },
+      "autoApprove": [
+        "ingest.analyze_document",
+        "ingest.extract_with_strategy",
+        "ingest.chunk_with_guidance",
+        "ingest.generate_metadata",
+        "ingest.assess_quality",
+        "ingest.enhance",
+        "kb.search",
+        "kb.dense",
+        "kb.hybrid",
+        "kb.rerank",
+        "kb.sparse",
+        "kb.sparse_splade",
+        "kb.colbert",
+        "kb.batch",
+        "kb.hint",
+        "kb.hyde",
+        "kb.quality",
+        "kb.table",
+        "kb.open",
+        "kb.neighbors",
+        "kb.summary",
+        "kb.outline",
+        "kb.entities",
+        "kb.linkouts",
+        "kb.graph",
+        "kb.promote",
+        "kb.demote",
+        "kb.collections"
+      ]
+    }
+  }
+}

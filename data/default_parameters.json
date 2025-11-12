@@ -1,0 +1,334 @@
+{
+  "metadata": {
+    "description": "Default design parameters for primary clarifier basis of design",
+    "version": "1.0.0",
+    "date_created": "2025-11-10",
+    "sources": [
+      "Metcalf & Eddy: Wastewater Engineering (5th ed.)",
+      "WEF Manual of Practice No. 8 (MOP 8)",
+      "Ten States Standards",
+      "QSDsan default parameters"
+    ]
+  },
+
+  "hydraulic": {
+    "flow_m3_d": {
+      "value": null,
+      "description": "Average design flow rate",
+      "units": "m³/day",
+      "required": true,
+      "typical_range": [500, 50000],
+      "validation": {
+        "min": 10,
+        "max": 500000,
+        "warning_below": 100,
+        "warning_above": 100000
+      }
+    },
+    "peak_factor": {
+      "value": 2.5,
+      "description": "Peak flow multiplier for hydraulic sizing",
+      "units": "dimensionless",
+      "required": false,
+      "typical_range": [2.0, 3.0],
+      "notes": "Typical: 2.5 for municipal, 2.0-2.2 for industrial with equalization"
+    },
+    "temperature_c": {
+      "value": 20.0,
+      "description": "Design operating temperature",
+      "units": "°C",
+      "required": false,
+      "typical_range": [10, 30],
+      "notes": "Affects viscosity and settling velocity"
+    }
+  },
+
+  "influent_quality": {
+    "tss_mg_l": {
+      "value": null,
+      "description": "Influent total suspended solids",
+      "units": "mg/L",
+      "required": true,
+      "typical_range": [150, 350],
+      "industrial_range": [200, 2000],
+      "validation": {
+        "min": 50,
+        "max": 5000,
+        "warning_below": 100,
+        "warning_above": 1000
+      }
+    },
+    "vss_mg_l": {
+      "value": null,
+      "description": "Influent volatile suspended solids",
+      "units": "mg/L",
+      "required": false,
+      "typical_range": [120, 280],
+      "notes": "Typically 75-85% of TSS for municipal wastewater",
+      "default_ratio_to_tss": 0.80
+    },
+    "cod_mg_l": {
+      "value": null,
+      "description": "Influent chemical oxygen demand",
+      "units": "mg/L",
+      "required": false,
+      "typical_range": [250, 600],
+      "industrial_range": [500, 5000],
+      "notes": "Required for performance modeling"
+    },
+    "bod5_mg_l": {
+      "value": null,
+      "description": "Influent 5-day biochemical oxygen demand",
+      "units": "mg/L",
+      "required": false,
+      "typical_range": [150, 300],
+      "industrial_range": [200, 2000],
+      "notes": "Typically 0.5-0.6 × COD for municipal wastewater",
+      "default_ratio_to_cod": 0.55
+    },
+    "tkn_mg_l": {
+      "value": null,
+      "description": "Influent total Kjeldahl nitrogen",
+      "units": "mg/L",
+      "required": false,
+      "typical_range": [20, 50],
+      "notes": "Organic nitrogen + ammonia"
+    },
+    "tp_mg_l": {
+      "value": null,
+      "description": "Influent total phosphorus",
+      "units": "mg/L",
+      "required": false,
+      "typical_range": [4, 12],
+      "notes": "Required if chemical precipitation is considered"
+    },
+    "oil_grease_mg_l": {
+      "value": null,
+      "description": "Influent oil & grease",
+      "units": "mg/L",
+      "required": false,
+      "typical_range": [50, 150],
+      "industrial_range": [100, 500],
+      "notes": "Important for industrial wastewater (food processing, refineries)"
+    },
+    "ph": {
+      "value": 7.0,
+      "description": "Influent pH",
+      "units": "dimensionless",
+      "required": false,
+      "typical_range": [6.5, 8.5],
+      "notes": "Affects coagulant performance if used"
+    }
+  },
+
+  "design_targets": {
+    "surface_overflow_rate_m3_m2_d": {
+      "value": 40.0,
+      "description": "Surface overflow rate (SOR)",
+      "units": "(m³/day)/m²",
+      "required": false,
+      "typical_range": [30, 50],
+      "industrial_range": [25, 45],
+      "notes": "Lower SOR for high TSS or when high removal efficiency needed",
+      "validation": {
+        "min": 20,
+        "max": 70,
+        "warning_below": 25,
+        "warning_above": 55
+      }
+    },
+    "solids_loading_rate_kg_m2_d": {
+      "value": null,
+      "description": "Solids loading rate (SLR)",
+      "units": "kg/(m²·day)",
+      "required": false,
+      "typical_range": [100, 150],
+      "notes": "Calculated from flow × TSS / area. Should check against limits.",
+      "validation": {
+        "max_without_chemicals": 200,
+        "max_with_chemicals": 300,
+        "warning_threshold": 150
+      }
+    },
+    "hrt_hours": {
+      "value": 2.0,
+      "description": "Target hydraulic retention time",
+      "units": "hours",
+      "required": false,
+      "typical_range": [1.5, 2.5],
+      "notes": "Checked after sizing, not directly used for design",
+      "validation": {
+        "min": 1.0,
+        "max": 4.0,
+        "warning_below": 1.5,
+        "warning_above": 3.0
+      }
+    },
+    "depth_m": {
+      "value": 3.5,
+      "description": "Clarifier side water depth",
+      "units": "m",
+      "required": false,
+      "typical_range": [3.0, 4.5],
+      "notes": "Most common: 3.5m. Deeper for industrial with high solids production.",
+      "validation": {
+        "min": 2.5,
+        "max": 6.0
+      }
+    },
+    "tss_removal_pct": {
+      "value": 60.0,
+      "description": "Target TSS removal efficiency",
+      "units": "%",
+      "required": false,
+      "typical_range": [50, 70],
+      "with_coagulation_range": [80, 90],
+      "notes": "Baseline without chemicals. 80-90% achievable with coagulation."
+    },
+    "underflow_solids_pct": {
+      "value": 4.0,
+      "description": "Target underflow (sludge) solids concentration",
+      "units": "% by weight",
+      "required": false,
+      "typical_range": [2.5, 6.0],
+      "notes": "Affects sludge pumping rate and downstream thickener design",
+      "validation": {
+        "min": 1.0,
+        "max": 8.0,
+        "warning_below": 2.0,
+        "warning_above": 7.0
+      }
+    }
+  },
+
+  "chemical_dosing": {
+    "coagulant_type": {
+      "value": "none",
+      "description": "Primary coagulant type",
+      "units": "categorical",
+      "required": false,
+      "options": ["none", "alum", "ferric_chloride", "lime"],
+      "notes": "Use coagulation for enhanced TSS/TP removal"
+    },
+    "coagulant_dose_mg_l": {
+      "value": 0.0,
+      "description": "Coagulant dose as substance",
+      "units": "mg/L",
+      "required": false,
+      "typical_ranges": {
+        "alum": [50, 250],
+        "ferric_chloride": [30, 150],
+        "lime": [150, 500]
+      },
+      "notes": "Optimize with jar tests. Zero if no coagulant used."
+    },
+    "polymer_type": {
+      "value": "none",
+      "description": "Polymer flocculant aid type",
+      "units": "categorical",
+      "required": false,
+      "options": ["none", "anionic", "cationic", "nonionic"],
+      "notes": "Low dose (0.5-3 mg/L) for floc strength enhancement"
+    },
+    "polymer_dose_mg_l": {
+      "value": 0.0,
+      "description": "Polymer dose",
+      "units": "mg/L",
+      "required": false,
+      "typical_range": [0.5, 3.0],
+      "notes": "Can reduce coagulant dose by 20-40%"
+    }
+  },
+
+  "operational_parameters": {
+    "number_of_clarifiers": {
+      "value": null,
+      "description": "Number of clarifier units",
+      "units": "count",
+      "required": false,
+      "notes": "Calculated from flow (QSDsan logic). Minimum 2 for N+1 redundancy.",
+      "validation": {
+        "min": 2,
+        "max": 20
+      }
+    },
+    "scraper_speed_rpm": {
+      "value": 0.03,
+      "description": "Sludge scraper rotational speed",
+      "units": "rpm",
+      "required": false,
+      "typical_range": [0.02, 0.05],
+      "notes": "Circular clarifiers with rotating bridge scraper"
+    },
+    "sludge_removal_frequency_hours": {
+      "value": 4.0,
+      "description": "Frequency of sludge withdrawal",
+      "units": "hours",
+      "required": false,
+      "typical_range": [2, 6],
+      "notes": "More frequent for high TSS to prevent septic conditions"
+    }
+  },
+
+  "validation_rules": {
+    "consistency_checks": [
+      {
+        "rule": "vss_tss_ratio",
+        "description": "VSS should be 0.70-0.85 × TSS for municipal WW",
+        "check": "0.70 <= vss_mg_l / tss_mg_l <= 0.85",
+        "severity": "warning",
+        "applicable_to": "municipal"
+      },
+      {
+        "rule": "bod_cod_ratio",
+        "description": "BOD5 should be 0.45-0.65 × COD for municipal WW",
+        "check": "0.45 <= bod5_mg_l / cod_mg_l <= 0.65",
+        "severity": "warning",
+        "applicable_to": "municipal"
+      },
+      {
+        "rule": "slr_limit_check",
+        "description": "SLR should not exceed 200 kg/m²/d without chemicals",
+        "check": "slr_kg_m2_d <= 200 if no coagulant else slr_kg_m2_d <= 300",
+        "severity": "error",
+        "applicable_to": "all"
+      },
+      {
+        "rule": "temperature_viscosity",
+        "description": "Low temperature (<15°C) may require SOR reduction",
+        "check": "temperature_c >= 15 or SOR reduced",
+        "severity": "warning",
+        "applicable_to": "all"
+      }
+    ],
+    "industrial_adaptations": {
+      "high_tss": {
+        "condition": "tss_mg_l > 500",
+        "recommendations": [
+          "Reduce SOR to 30-35 m³/m²/d",
+          "Consider upstream screening or equalization",
+          "Increase underflow solids target to 5-6%",
+          "Increase sludge removal frequency"
+        ]
+      },
+      "high_oil_grease": {
+        "condition": "oil_grease_mg_l > 200",
+        "recommendations": [
+          "Add skimmer equipment",
+          "Consider pre-treatment (DAF, API separator)",
+          "Reduce HRT to minimize anaerobic conditions",
+          "Monitor for scum accumulation"
+        ]
+      },
+      "low_temperature": {
+        "condition": "temperature_c < 15",
+        "recommendations": [
+          "Reduce SOR by 10-20%",
+          "Increase HRT",
+          "Consider coagulation enhancement",
+          "Adjust scraper speed (may need slower)"
+        ]
+      }
+    }
+  }
+}

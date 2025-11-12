@@ -1,0 +1,224 @@
+{
+  "metadata": {
+    "design_type": "lamella_settler",
+    "source": "AguaClara aguaclara/design/sed_tank.py:45-88",
+    "description": "Parallel plate (lamella) settler design parameters from AguaClara water treatment design library",
+    "license": "MIT",
+    "reference": "Weber-Shirk et al., AguaClara: Open-Source Water Treatment Plant Design",
+    "date_created": "2025-11-10",
+    "notes": "Parameters adapted for industrial wastewater primary clarification"
+  },
+
+  "hydraulic_parameters": {
+    "upflow_velocity_mm_s": {
+      "value": 1.0,
+      "description": "Design upflow velocity through plate stack",
+      "units": "mm/s",
+      "typical_range": [0.8, 1.5],
+      "notes": "Lower for high TSS (>500 mg/L), higher for low TSS applications"
+    },
+    "capture_velocity_mm_s": {
+      "value": 0.12,
+      "description": "Minimum particle settling velocity to be captured",
+      "units": "mm/s",
+      "typical_range": [0.08, 0.20],
+      "notes": "Based on target particle size removal. 0.12 mm/s ≈ 50 µm particles"
+    },
+    "hydraulic_loading_multiplier": {
+      "value": 3.5,
+      "description": "Surface loading rate multiplier compared to conventional clarifiers",
+      "units": "dimensionless",
+      "typical_range": [3.0, 5.0],
+      "notes": "Lamella clarifiers can handle 3-5× higher loading than conventional"
+    }
+  },
+
+  "geometry_parameters": {
+    "plate_angle_degrees": {
+      "value": 60,
+      "description": "Angle of lamella plates from horizontal",
+      "units": "degrees",
+      "typical_range": [45, 65],
+      "notes": "60° is standard. Steeper angles (55-65°) better for sludge sliding"
+    },
+    "plate_spacing_cm": {
+      "value": 4.0,
+      "description": "Perpendicular distance between adjacent plates (WASTEWATER DEFAULT)",
+      "units": "cm",
+      "typical_range": [3.5, 5.0],
+      "drinking_water_standard": "2.5 cm (AguaClara default for low-TSS potable water)",
+      "wastewater_standard": "4.0 cm (prevents clogging with TSS 150-500 mg/L)",
+      "industrial_adaptation": "Increase to 5.0 cm for very high TSS (>800 mg/L) or fibrous solids"
+    },
+    "plate_length_m": {
+      "value": 1.5,
+      "description": "Length of each plate (flow direction)",
+      "units": "m",
+      "typical_range": [1.0, 2.5],
+      "notes": "Longer plates = higher removal but more expensive. Limited by structural support."
+    },
+    "plate_thickness_mm": {
+      "value": 1.5,
+      "description": "Thickness of lamella plate material",
+      "units": "mm",
+      "typical_range": [1.0, 3.0],
+      "materials": ["PVC", "polypropylene", "fiberglass"]
+    }
+  },
+
+  "diffuser_parameters": {
+    "diffuser_spacing_cm": {
+      "value": 15,
+      "description": "Spacing between influent diffuser orifices",
+      "units": "cm",
+      "typical_range": [10, 20],
+      "notes": "Even distribution critical for performance"
+    },
+    "manifold_orifice_diameter_mm": {
+      "value": 12,
+      "description": "Diameter of diffuser orifices",
+      "units": "mm",
+      "typical_range": [8, 15],
+      "notes": "Larger orifices for high TSS to prevent clogging"
+    }
+  },
+
+  "design_guidelines": {
+    "applications": [
+      "High-rate sedimentation (3-5× conventional loading)",
+      "Retrofit of existing clarifiers (add plates to increase capacity)",
+      "Space-constrained installations (smaller footprint than conventional)",
+      "Industrial wastewater with settleable solids (TSS 200-2000 mg/L)",
+      "Primary clarification ahead of biological treatment"
+    ],
+
+    "advantages": [
+      "Higher hydraulic loading rates (120-200 m³/m²/d vs. 30-50 for conventional)",
+      "Smaller footprint (60-70% reduction in plan area)",
+      "Shorter HRT (0.5-1.0 hour vs. 1.5-2.5 for conventional)",
+      "Modular design (easy to expand or retrofit)",
+      "Good performance with variable flow rates"
+    ],
+
+    "limitations": [
+      "Requires consistent influent TSS (wide fluctuations cause problems)",
+      "More susceptible to clogging than conventional (need good screening)",
+      "Higher maintenance (periodic plate cleaning required)",
+      "Not suitable for very high TSS (>2000 mg/L) without pre-treatment",
+      "Sludge removal must be frequent to prevent re-suspension"
+    ],
+
+    "industrial_adaptations": {
+      "high_tss": "Increase plate spacing to 3-4 cm (vs. 2.5 cm standard)",
+      "oil_grease": "Add coalescing media or pre-treatment DAF unit",
+      "fibrous_solids": "Add upstream screening (≤3 mm openings)",
+      "temperature_effects": "Adjust upflow velocity: ±0.1 mm/s per 10°C from 20°C",
+      "chemical_dosing": "Coagulation can improve removal by 15-25% (optimize with jar tests)"
+    }
+  },
+
+  "design_equations": {
+    "plate_surface_area": {
+      "formula": "A_plate = L × W / sin(θ)",
+      "description": "Projected settling area per plate",
+      "variables": {
+        "L": "Plate length (m)",
+        "W": "Plate width (m)",
+        "θ": "Plate angle from horizontal (radians)"
+      }
+    },
+    "number_of_plates": {
+      "formula": "N = (H - 2×S) / (S×cos(θ) + t)",
+      "description": "Number of plates that fit in given height",
+      "variables": {
+        "H": "Available height (m)",
+        "S": "Plate spacing perpendicular to plates (m)",
+        "θ": "Plate angle from horizontal (radians)",
+        "t": "Plate thickness (m)"
+      }
+    },
+    "total_settling_area": {
+      "formula": "A_total = N × A_plate",
+      "description": "Total projected settling area for all plates",
+      "notes": "This is the effective area for SOR calculations"
+    },
+    "hydraulic_loading_rate": {
+      "formula": "HLR = Q / A_total",
+      "description": "Surface overflow rate based on total plate area",
+      "typical_value": "120-200 m³/m²/d for lamella (vs. 30-50 for conventional)",
+      "units": "m³/m²/d"
+    }
+  },
+
+  "performance_expectations": {
+    "tss_removal": {
+      "baseline": "60-75%",
+      "with_coagulation": "85-92%",
+      "notes": "Performance similar to conventional clarifiers but at higher loading rates"
+    },
+    "bod_removal": {
+      "baseline": "30-40%",
+      "with_coagulation": "50-65%",
+      "notes": "Depends on particulate BOD fraction"
+    },
+    "particle_size_cutoff": {
+      "value_microns": 50,
+      "description": "Particles larger than this are typically removed (>90% efficiency)",
+      "notes": "Based on capture velocity of 0.12 mm/s"
+    }
+  },
+
+  "cost_factors": {
+    "capex_multiplier": {
+      "value": 0.65,
+      "description": "CAPEX compared to conventional clarifier (same capacity)",
+      "notes": "Lower due to smaller footprint and less excavation"
+    },
+    "opex_considerations": [
+      "Higher maintenance labor (periodic plate cleaning)",
+      "Lower pumping energy (shorter distances, less head loss)",
+      "Similar chemical costs (if using coagulation)",
+      "Plate replacement every 10-15 years"
+    ]
+  },
+
+  "example_calculations": {
+    "case_1_municipal": {
+      "description": "Typical municipal wastewater primary treatment",
+      "inputs": {
+        "flow_m3_d": 5000,
+        "influent_tss_mg_l": 250,
+        "plate_length_m": 1.5,
+        "plate_width_m": 2.0,
+        "plate_angle_deg": 60,
+        "plate_spacing_cm": 2.5,
+        "available_height_m": 3.0
+      },
+      "outputs": {
+        "number_of_plates": 58,
+        "total_settling_area_m2": 201,
+        "hydraulic_loading_rate_m3_m2_d": 24.9,
+        "plan_area_m2": 58,
+        "footprint_reduction": "65% vs. conventional 165 m²"
+      }
+    },
+    "case_2_industrial": {
+      "description": "Industrial wastewater with high TSS",
+      "inputs": {
+        "flow_m3_d": 2000,
+        "influent_tss_mg_l": 800,
+        "plate_length_m": 2.0,
+        "plate_width_m": 2.5,
+        "plate_angle_deg": 60,
+        "plate_spacing_cm": 3.5,
+        "available_height_m": 3.5
+      },
+      "outputs": {
+        "number_of_plates": 42,
+        "total_settling_area_m2": 242,
+        "hydraulic_loading_rate_m3_m2_d": 8.3,
+        "notes": "Wider spacing reduces clogging risk with high TSS"
+      }
+    }
+  }
+}
