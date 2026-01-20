@@ -19,6 +19,19 @@ Validation:
 from typing import Optional, Dict, Any, Tuple
 from dataclasses import dataclass, field, asdict
 import json
+import logging
+
+# Import water chemistry functions from plant_state
+try:
+    from plant_state.water_chemistry import calculate_charge_balance
+    PLANT_STATE_AVAILABLE = True
+except ImportError as e:
+    PLANT_STATE_AVAILABLE = False
+    logging.warning(
+        f"plant_state not available: {e}. "
+        "Charge balance validation will be skipped. "
+        "Install with: pip install -e ../plant_state"
+    )
 
 
 @dataclass
@@ -166,11 +179,20 @@ class ClarifierBasisOfDesign:
                     )
 
         # 7. Charge balance check if ions provided
-        if self.ion_composition:
-            is_balanced, imbalance_pct = self._check_charge_balance(self.ion_composition)
-            if not is_balanced:
+        if self.ion_composition and PLANT_STATE_AVAILABLE:
+            try:
+                balance_result = calculate_charge_balance(
+                    ion_composition=self.ion_composition,
+                    tolerance_pct=5.0,
+                    temperature_c=self.temperature_c
+                )
+                if not balance_result["is_balanced"]:
+                    self.validation_warnings.append(
+                        f"Charge imbalance {balance_result['imbalance_pct']:.1f}% (threshold 5%)"
+                    )
+            except Exception as e:
                 self.validation_warnings.append(
-                    f"Charge imbalance {imbalance_pct:.1f}% (threshold 5%)"
+                    f"Charge balance calculation failed: {e}"
                 )
 
         # 8. Total nitrogen check
@@ -195,68 +217,6 @@ class ClarifierBasisOfDesign:
                 f"Target underflow solids {self.target_underflow_solids_pct}% "
                 "outside typical range (1-10%)"
             )
-
-    def _check_charge_balance(
-        self,
-        ions: Dict[str, float],
-        tolerance_pct: float = 5.0
-    ) -> Tuple[bool, float]:
-        """
-        Check electroneutrality of ion composition.
-
-        Args:
-            ions: Ion concentrations in mg/L
-            tolerance_pct: Acceptable imbalance percentage
-
-        Returns:
-            (is_balanced, imbalance_percentage)
-        """
-        # Define ion properties (charge, molecular weight)
-        # Note: NH4, NO3, PO4 are typically reported "as N" or "as P" in wastewater
-        ion_properties = {
-            "Ca_mg_l": {"charge": 2, "mw": 40.08},
-            "Mg_mg_l": {"charge": 2, "mw": 24.31},
-            "Na_mg_l": {"charge": 1, "mw": 22.99},
-            "K_mg_l": {"charge": 1, "mw": 39.10},
-            "NH4_mg_l": {"charge": 1, "mw": 14.01},  # As N basis (NH4-N)
-            "Cl_mg_l": {"charge": -1, "mw": 35.45},
-            "SO4_mg_l": {"charge": -2, "mw": 96.06},
-            "HCO3_mg_l": {"charge": -1, "mw": 61.02},
-            "CO3_mg_l": {"charge": -2, "mw": 60.01},
-            "NO3_mg_l": {"charge": -1, "mw": 14.01},  # As N basis (NO3-N)
-            "PO4_mg_l": {"charge": -3, "mw": 30.97},  # As P basis (PO4-P)
-        }
-
-        # Calculate total positive and negative charges (meq/L)
-        cations_meq_l = 0.0
-        anions_meq_l = 0.0
-
-        for ion_key, conc_mg_l in ions.items():
-            if ion_key not in ion_properties:
-                continue
-
-            props = ion_properties[ion_key]
-            charge = props["charge"]
-            mw = props["mw"]
-
-            # Convert mg/L to meq/L: (mg/L) / (g/mol) * |charge|
-            # mg/L ÷ (g/mol) = mmol/L, and mmol/L * charge = meq/L
-            meq_l = (conc_mg_l / mw) * abs(charge)
-
-            if charge > 0:
-                cations_meq_l += meq_l
-            else:
-                anions_meq_l += meq_l
-
-        # Calculate imbalance percentage
-        total_charge = cations_meq_l + anions_meq_l
-        if total_charge == 0:
-            return True, 0.0
-
-        imbalance_pct = abs(cations_meq_l - anions_meq_l) / total_charge * 100
-        is_balanced = imbalance_pct <= tolerance_pct
-
-        return is_balanced, imbalance_pct
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
