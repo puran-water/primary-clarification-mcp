@@ -48,3 +48,4 @@ Thumbs.db
 
 # Claude Code settings
 **/.claude/settings.local.json
+*.pyc
